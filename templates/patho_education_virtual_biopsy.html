@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            rel="stylesheet"
+    />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.8/dist/annotorious.min.css">
+    <script src="static/openseadragon/openseadragon.min.js"></script>
+
+    <title>PathoEducation</title>
+    <link rel="stylesheet" href="static/virtual.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>    var btnName = function() {
+      $.post('/controller',
+        function(x) {
+          console.log('Button Pressed Front End Call Back!')
+          console.log(x.data)
+        }
+      )
+    }
+
+    var clear1 = function() {
+      v1.clearAnnotations();
+    }
+    var clear2 = function() {
+      v2.clearAnnotations();
+    }
+
+    </script>
+
+</head>
+<body>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/annotorious.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/openseadragon-annotorious.min.js"></script>
+<div class="header">
+  <div class="grid-container2">
+    <div>  <h1>PathoEducation<small style="font-size: 1; color:bisque"> virtual biopsy</small></h1>    </div>
+    <div>    </div>
+    <div>     </div>
+    <div>   iNaglah.com    </div>
+  </div>
+</div>
+
+<div class="grid-container">
+  <div  id="openseadragon1" style="width: 100%; height: 800px"></div>
+  <div id="controls" >
+    <button type="button" class="btn btn-primary" id="resection">H&E [Resection]</button>
+    <button type="button" class="btn btn-primary" id="biopsy">Generate Virtual Biopsy [PIN4]</button>
+    <button type="button" class="btn btn-primary" id="he">View H&E</button>
+    <button type="button" class="btn btn-primary" id="pin4">View PIN4</button>
+
+    <div id="alignStatus"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    var viewer = OpenSeadragon({
+      id: "openseadragon1",
+      showNavigator:  true,
+      prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+      tileSources: [
+        {
+          opacity: 1,
+          tileSource: "{{slide1}}",
+        },
+        {
+          opacity: 0,
+          tileSource: "{{slide4}}",
+        },
+        {
+          opacity: 0,
+          tileSource: "{{slide1}}",
+        }
+      ]
+    });
+    var number = 2;
+
+    var v1 = OpenSeadragon.Annotorious(viewer);
+
+    setCrop = function(polygon){
+      console.log('Inside set Crop');
+      console.log(polygon);
+      viewer.world.getItemAt(1).setCroppingPolygons(polygon);
+      viewer.world.getItemAt(2).setCroppingPolygons(polygon);
+      viewer.forceRedraw();
+    };
+
+    getBiopsy = function(){
+      number = Math.ceil(Math.random() * 30);
+      var path = "https://inaglah.com/get_biopsy/" + number.toString();
+      $.get(path,
+        function(x) {
+          console.log('inside getBiopsy!')
+          data = x.data
+          setCrop(data)
+          console.log(x.data)
+        }
+      );
+    };
+
+    getBiopsy();
+
+    document.getElementById("biopsy").onclick = function biopsyProcess() {
+      viewer.world.getItemAt(1).setOpacity(0);
+      viewer.world.getItemAt(0).setOpacity(0);
+      getBiopsy();
+      viewer.world.getItemAt(1).setOpacity(1);
+    };
+
+    document.getElementById("resection").onclick = function resectionProcess() {
+      viewer.world.getItemAt(0).setOpacity(1);
+      viewer.world.getItemAt(1).setOpacity(0);
+    };
+
+    document.getElementById("he").onclick = function resectionProcess() {
+      viewer.world.getItemAt(0).setOpacity(0);
+      viewer.world.getItemAt(1).setOpacity(0);
+      viewer.world.getItemAt(2).setOpacity(1);
+    };
+
+    document.getElementById("pin4").onclick = function resectionProcess() {
+      viewer.world.getItemAt(0).setOpacity(0);
+      viewer.world.getItemAt(1).setOpacity(1);
+      viewer.world.getItemAt(2).setOpacity(0);    
+    };
+
+</script>
+
+</body>
+</html>
+

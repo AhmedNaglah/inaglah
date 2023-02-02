@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link rel="shortcut icon" type="image/x-icon" href="static/logo.png" />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            rel="stylesheet"
+    />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.8/dist/annotorious.min.css">
+
+    <title>PathoST</title>
+    <link rel="stylesheet" href="static/root_modular.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="static/openseadragon/openseadragon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/annotorious.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/openseadragon-annotorious.min.js"></script>
+
+    <script type="text/javascript">
+      window.onload = function() {
+        var viewer = OpenSeadragon({
+        id: "seadragon-viewer",
+        showNavigator:  true,
+        prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+        tileSources: 'static/assets/XY01_IU-21-015F.dzi'
+        });
+    
+        var viewer2 = OpenSeadragon({
+          id: "seadragon-viewer2",
+          showNavigator:  true,
+          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+          tileSources: 'static/assets/XY01_IU-21-015F.dzi'
+        });
+    
+        var v1 = OpenSeadragon.Annotorious(viewer);
+        var v2 = OpenSeadragon.Annotorious(viewer2);
+
+        var myformatter = function (annotation) {
+          var tagBodies = annotation.bodies.filter(function (body) {
+            return body.type === "TextualBody" && body.purpose === "tagging";
+          });
+          return tagBodies[0].value;
+        };
+
+        v1.formatters = myformatter;
+
+        v1.loadAnnotations('static/anno.json');
+        v2.loadAnnotations('static/anno2.json');
+
+        v1.on('selectAnnotation', function(annotation, element) {
+          s_gene.send(annotation['id']);
+          s_cell.send(annotation['id']);
+        });
+
+        //v1.on('changeSelectionTarget', function(annotation) {
+        //  console.log(annotation)
+        //  s_gene_given.send(annotation['selector']['value']);
+        //  s_cell_given.send(annotation['selector']['value']);
+        //});
+
+        console.log(v1);
+      }
+    </script>
+
+    <script>    
+      var loadH = function() {
+      }
+    </script>
+
+    <script>    
+      /*
+        document.addEventListener('DOMContentLoaded', function(event) {
+            //the event occurred
+            const button = document.getElementById('post-btn');
+
+            button.addEventListener('click', async _ => {
+            try {     
+                const data = { compartment_id: document.getElementById('compartment_id').innerText, gene_id: document.getElementById('gene_id').innerText };
+                const response = await fetch
+                ('reload', {
+                            headers: { "Content-Type": "application/json" },
+                            method: 'POST',
+                            body: JSON.stringify(data)
+                });
+                console.log('Completed!', response);
+            } catch(err) {
+                console.error(`Error: ${err}`);
+            }
+            });
+        }) */
+    </script>
+
+</head>
+<body>
+
+<div class="header">
+  <div class="grid-container2">
+    <div>  <h1>PathoST<small style="font-size: 1; color:bisque">analyzer</small></h1>    </div>
+    <div>    </div>
+    <div>     </div>
+    <div>   iNaglah.com   </div>
+  </div>
+</div>
+
+<div class="grid-container">
+  <div id="seadragon-viewer" ></div>
+  <div id="seadragon-viewer2" ></div>
+  <div id="controls" >  
+    <h5>Compartment Analysis</h5>
+    <h6>Spatial Transcriptomics Analysis</h6>
+    <canvas id="mypiechart"></canvas>
+    <h6>Cell Deconvolution</h6>
+    <canvas id="mypiechart_"></canvas>
+
+  </div>
+</div>
+
+<script>
+  /*const log = (text, color) => {document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;};
+  const socket = new WebSocket('wss://' + location.host + '/update_compartment');
+  socket.addEventListener('message', ev => {log('<<< ' + ev.data, 'blue');});
+  document.getElementById('form').onsubmit = ev => {
+    ev.preventDefault();
+    const textField = document.getElementById('text');
+    log('>>> ' + textField.value, 'red');
+    socket.send(textField.value);
+    textField.value = '';
+  };*/
+</script>
+
+<script>
+  const piechart = (text) => {document.getElementById('piechart').innerHTML = `<span>${text}</span>`;};
+  const log = (text) => {document.getElementById('log').innerHTML = `<span>${text}</span>`;};
+  const gene_handler = (a) => { 
+    //document.getElementById("info1").innerText = a;
+    console.log(a)
+    var a_ = a.replace('[','').replace(']','').replace(' ', '')
+    const a__ = a_.split(',')
+
+    xValues = a__.slice(0, 10);
+    yValues = a__.slice(10, 20);
+    console.log('rendering chart');
+    console.log(xValues);
+    console.log(yValues);
+
+    geneChart.destroy();
+    geneChart = new Chart("mypiechart", {
+      type: "pie",
+      data: {
+      labels: xValues,
+      datasets: [{
+        backgroundColor: barColors,
+        data: yValues
+      }]
+      },
+      options: {
+      title: {
+        display: true,
+        text: ""
+      }
+      }
+    });
+  };
+
+  var xValues_ = ["", "", "", "", ""];
+  var yValues_ = [1, 1, 1, 1, 1];
+  var barColors_ = [
+  '#1a1c33',
+    '#223651',
+    '#517396',
+    '#7ba7c2',
+    '#d0e3ea',
+    '#fff33b',
+    '#fdc70c',
+    '#f3903f',
+    '#ed683c',
+    '#e93e3a'
+  ]
+
+  var cellChart = new Chart("mypiechart_", {
+  type: "pie",
+  data: {
+  labels: xValues_,
+  datasets: [{
+    backgroundColor: barColors_,
+    data: yValues_
+  }]
+  },
+  options: {
+  title: {
+    display: true,
+    text: ""
+  }
+  }
+  });
+
+  const cell_handler = (a) => { 
+    //document.getElementById("info2").innerText = a;
+    console.log(a);
+    var a_ = a.replace('[','').replace(']','').replace(' ', '');
+    const a__ = a_.split(',');
+
+    xValues_ = a__.slice(0, 10);
+    yValues_ = a__.slice(10, 20);
+    console.log('rendering chart');
+    console.log(xValues_);
+    console.log(yValues_);
+
+    cellChart.destroy()
+    
+    cellChart = new Chart("mypiechart_", {
+      type: "pie",
+      data: {
+      labels: xValues_,
+      datasets: [{
+        backgroundColor: barColors_,
+        data: yValues_
+      }]
+      },
+      options: {
+      title: {
+        display: true,
+        text: ""
+      }
+      }
+      });
+  
+  };
+
+
+  const s_gene = new WebSocket('wss://' + location.host + '/get_gene_data');
+  const s_cell = new WebSocket('wss://' + location.host + '/get_cell_data');
+  const s_gene_given = new WebSocket('wss://' + location.host + '/get_gene_data_given');
+  const s_cell_given = new WebSocket('wss://' + location.host + '/get_cell_data_given');
+
+  const s1 = new WebSocket('wss://' + location.host + '/update_compartment');
+  const s2 = new WebSocket('wss://' + location.host + '/get_compartment_data');
+  s1.addEventListener('message', ev => {log(ev.data);});
+  s2.addEventListener('message', ev => {log(ev.data);});
+  s_gene.addEventListener('message', ev => {gene_handler(ev.data);});
+  s_cell.addEventListener('message', ev => {cell_handler(ev.data);});
+  s_gene_given.addEventListener('message', ev => {gene_handler(ev.data);});
+  s_cell_given.addEventListener('message', ev => {cell_handler(ev.data);});
+
+  var xValues = ["", "", "", "", ""];
+  var yValues = [1, 1, 1, 1, 1];
+
+  var barColors = [
+    '#1a1c33',
+    '#223651',
+    '#517396',
+    '#7ba7c2',
+    '#d0e3ea',
+    '#fff33b',
+    '#fdc70c',
+    '#f3903f',
+    '#ed683c',
+    '#e93e3a'
+  ]
+
+  var geneChart = new Chart("mypiechart", {
+  type: "pie",
+  data: {
+  labels: xValues,
+  datasets: [{
+    backgroundColor: barColors,
+    data: yValues
+  }]
+  },
+  options: {
+  title: {
+    display: true,
+    text: ""
+  }
+  }
+  });
+
+
+
+</script>
+
+</body>
+</html>
+

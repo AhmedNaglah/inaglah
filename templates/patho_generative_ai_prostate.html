@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link rel="shortcut icon" type="image/x-icon" href="static/logo.png" />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            rel="stylesheet"
+    />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.8/dist/annotorious.min.css">
+
+    <title>PathoGenerative-AI</title>
+    <script src="static/openseadragon/openseadragon.min.js"></script>
+
+    <link rel="stylesheet" href="static/virtual.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="grid-container2">
+        <div>  <h1>PathoGenerative-AI <small style="font-size: 1; color:bisque"> prostate </small></h1>    </div>
+        <div>    </div>
+        <div>     </div>
+        <div>   iNaglah.com    </div>
+    </div>
+</div>
+
+<div class="grid-container">
+    <div  id="openseadragon1" style="width: 100%; height: 800px"></div>
+    <div id="controls" >
+        <div class="slidecontainer">
+            <input class="slider" hidden="true" id="myRange" max="100" min="0" type="range" value="50">
+        </div>
+        <button type="button" class="btn btn-primary"  id="HE">H&E</button>
+        <button type="button" class="btn btn-primary" id="PIN4">Original PIN4</button>
+        <button type="button" class="btn btn-primary" id="PIN4_Virtual">Virtual PIN4 [cGANs]</button>
+
+        <div id="alignStatus"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  var result = new Array();
+  var slider = document.getElementById("myRange");
+  var output = document.getElementById("value");
+  var x = 0;
+  var stain_chosen = 0;
+
+  document.getElementById("HE").onclick = function HE() {
+        viewer.world.getItemAt(0).setOpacity(1);
+        viewer.world.getItemAt(1).setOpacity(0);
+        viewer.world.getItemAt(2).setOpacity(0);
+        viewer.world.getItemAt(3).setOpacity(0);
+        stain_chosen = 0;
+  }
+
+  document.getElementById("PIN4").onclick = function PIN4() {
+        viewer.world.getItemAt(0).setOpacity(0);
+        viewer.world.getItemAt(1).setOpacity(1);
+        viewer.world.getItemAt(2).setOpacity(0);
+        viewer.world.getItemAt(3).setOpacity(0);
+        stain_chosen = 1;
+  }
+
+  document.getElementById("PIN4_Virtual").onclick = function PIN4Virtual() {
+        viewer.world.getItemAt(0).setOpacity(0);
+        viewer.world.getItemAt(1).setOpacity(0);
+        viewer.world.getItemAt(2).setOpacity(0);
+        viewer.world.getItemAt(3).setOpacity(1);
+        stain_chosen = 3;
+  }
+
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/annotorious.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/openseadragon-annotorious.min.js"></script>
+
+<script type="text/javascript">
+      var viewer = OpenSeadragon({
+        id: "openseadragon1",
+        showNavigator:  true,
+        prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+        tileSources: [
+          {
+            opacity: 1,
+            tileSource: "{{slide1}}",
+          },
+          {
+            opacity: 0,
+            tileSource: "{{slide2}}",
+          },
+          {
+            opacity: 0,
+            tileSource: "{{slide2}}",
+          },
+          {
+            opacity: 0,
+            tileSource: "{{slide4}}",
+          },
+        ],
+      });
+    var v1 = OpenSeadragon.Annotorious(viewer);
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link rel="shortcut icon" type="image/x-icon" href="static/logo.png" />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            rel="stylesheet"
+    />
+    <link
+            crossorigin="anonymous"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.8/dist/annotorious.min.css">
+
+    <title>PathoST</title>
+    <link rel="stylesheet" href="static/root.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="static/openseadragon/build/openseadragon/openseadragon.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/annotorious.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon@2.7.9/dist/openseadragon-annotorious.min.js"></script>
+
+    <script type="text/javascript">
+      window.onload = function() {
+        var viewer = OpenSeadragon({
+        id: "seadragon-viewer",
+        showNavigator:  true,
+        prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+        tileSources: 'static/assets/XY01_IU-21-015F.dzi'
+        });
+    
+        var viewer2 = OpenSeadragon({
+          id: "seadragon-viewer2",
+          showNavigator:  true,
+          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+          tileSources: 'static/assets/XY01_IU-21-015F.dzi'
+        });
+    
+        var v1 = OpenSeadragon.Annotorious(viewer);
+        var v2 = OpenSeadragon.Annotorious(viewer2);
+
+        v1.loadAnnotations('static/assets/anno.json');
+        v2.loadAnnotations('static/assets/anno2.json');
+
+      }
+    </script>
+
+    <script>    
+      var loadH = function() {
+      }
+
+    </script>
+</head>
+<body>
+
+<div class="header">
+  <div class="grid-container2">
+    <div>  <h1>PathoST<small style="font-size: 1; color:bisque"> analyzer</small></h1>    </div>
+    <div>    </div>
+    <div>     </div>
+    <div>   iNaglah.com    </div>
+  </div>
+</div>
+
+<div class="grid-container">
+  <div id="seadragon-viewer" ></div>
+  <div id="seadragon-viewer2" ></div>
+  <div id="alignment" >
+    <img src="static/assets/im1.png" alt="" id="im1" class="alignedImage">
+    <img src="static/assets/im2.png" alt="" id="im2" class="alignedImage">
+  </div>
+  <div id="controls" >
+    <button type="button" class="btn btn-primary" onclick="loadH()">Histologic</button>
+    <button type="button" class="btn btn-primary" onclick="loadH()">Compartmental</button>
+    <button type="button" class="btn btn-primary" onclick="loadH()">Visium Spot</button>
+    <button type="button" class="btn btn-primary" onclick="loadH()">Cell Level</button>
+    <div id="alignStatus"></div>
+  </div>
+</div>
+
+</body>
+</html>
+
